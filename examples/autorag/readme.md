@@ -62,35 +62,40 @@ flowchart LR
     User[User question] --> Retrieve[Retrieve relevant context<br/>from grounding documents]
     Retrieve --> LLM[LLM generates answer<br/>using retrieved context]
     LLM --> Answer[Answer with relevant<br/>information]
+    style User fill:#64748b,color:#fff,stroke-width:2px
+    style Retrieve fill:#4a90d9,color:#fff,stroke-width:2px
+    style LLM fill:#4a90d9,color:#fff,stroke-width:2px
+    style Answer fill:#2d8659,color:#fff,stroke-width:2px
 ```
 
-**2. Documents RAG optimization pipeline** — Kubeflow pipeline steps from the [documents RAG optimization pipeline](https://github.com/LukaszCmielowski/pipelines-components/tree/rhoai_autorag/pipelines/training/autorag/documents_rag_optimization_pipeline): load test data and input documents, sample and extract text, prepare the search space, run RAG templates optimization (HPO), then evaluate patterns on a leaderboard.
+**Documents RAG optimization pipeline** — Kubeflow pipeline steps from the [documents RAG optimization pipeline](https://github.com/LukaszCmielowski/pipelines-components/tree/rhoai_autorag/pipelines/training/autorag/documents_rag_optimization_pipeline): load test data and input documents, sample and extract text, prepare the search space, run RAG templates optimization (HPO), then evaluate patterns on a leaderboard.
 
 ```mermaid
-flowchart TB
-    subgraph data["Data loading & preparation"]
-        TDL[Test data loader]
-        DS[Documents sampling]
-        TE[Text extraction]
-        TDL --> DS
-        DS --> TE
-    end
-
-    subgraph search["Search space"]
-        SSP[Search space preparation]
-    end
-
-    subgraph optimization["Optimization & evaluation"]
-        RTO[RAG templates optimization]
-        LB[Leaderboard evaluation]
-        RTO --> LB
-    end
-
-    TDL --> SSP
-    TE --> SSP
-    TE --> RTO
-    TDL --> RTO
-    SSP --> RTO
+flowchart LR
+    Start([Pipeline Start]) --> DataIngestion["Data Ingestion<br/>Load documents & test data"]
+    DataIngestion --> DocProcessing["Document Processing<br/>Sample & extract text"]
+    DocProcessing --> SearchSpace["Search Space Definition<br/>Define configurations & validate models"]
+    SearchSpace --> OptLoop{"Optimization<br/>Loop"}
+    OptLoop --> SelectConfig["Select Configuration<br/>GAM prediction"]
+    SelectConfig --> ExecuteRAG["Execute RAG Pipeline<br/>Run configuration"]
+    ExecuteRAG --> Evaluate["Evaluate Performance<br/>Test data metrics"]
+    Evaluate --> UpdateLeaderboard["Artifacts storage<br/>RAG Pattern"]
+    UpdateLeaderboard --> CheckMax{"Reached max<br/>patterns?"}
+    CheckMax -->|No| OptLoop
+    CheckMax -->|Yes| ResultsStorage["Artifacts Storage<br/>Leaderboard & logs"]
+    ResultsStorage --> End([Pipeline Complete])
+    style Start fill:#2d8659,color:#fff,stroke-width:2px
+    style End fill:#2d8659,color:#fff,stroke-width:2px
+    style OptLoop fill:#d97706,color:#fff,stroke-width:2px
+    style CheckMax fill:#d97706,color:#fff,stroke-width:2px
+    style DataIngestion fill:#4a90d9,color:#fff,stroke-width:2px
+    style DocProcessing fill:#4a90d9,color:#fff,stroke-width:2px
+    style SearchSpace fill:#4a90d9,color:#fff,stroke-width:2px
+    style SelectConfig fill:#4a90d9,color:#fff,stroke-width:2px
+    style ExecuteRAG fill:#4a90d9,color:#fff,stroke-width:2px
+    style Evaluate fill:#4a90d9,color:#fff,stroke-width:2px
+    style UpdateLeaderboard fill:#4a90d9,color:#fff,stroke-width:2px
+    style ResultsStorage fill:#4a90d9,color:#fff,stroke-width:2px
 ```
 
 **RAG configuration optimization** — The optimizer chooses which subset of the configuration search space to evaluate (e.g. 16 candidate patterns); it ranks evaluated patterns and tags the top performers (e.g. top 3) as best, and skips the rest to avoid full grid search.
@@ -117,9 +122,18 @@ flowchart LR
     space --> evaluated
     space --> skipped
     evaluated --> Best[Best performing<br/>configurations]
+    style P1 fill:#64748b,color:#fff,stroke-width:2px
+    style P2 fill:#64748b,color:#fff,stroke-width:2px
+    style P3 fill:#64748b,color:#fff,stroke-width:2px
+    style Pn fill:#64748b,color:#fff,stroke-width:2px
+    style E1 fill:#4a90d9,color:#fff,stroke-width:2px
+    style E2 fill:#4a90d9,color:#fff,stroke-width:2px
+    style E3 fill:#4a90d9,color:#fff,stroke-width:2px
+    style S fill:#64748b,color:#fff,stroke-width:2px
+    style Best fill:#2d8659,color:#fff,stroke-width:2px
 ```
 
-### Pipeline flow (ai4rag)
+### Pipeline flow
 
 The [Documents RAG Optimization Pipeline](https://github.com/LukaszCmielowski/pipelines-components/tree/rhoai_autorag/pipelines/training/autorag/documents_rag_optimization_pipeline) uses the [IBM ai4rag](https://github.com/IBM/ai4rag) optimization engine. In that flow:
 

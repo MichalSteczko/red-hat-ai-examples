@@ -1,4 +1,4 @@
-# AutoRAG (Developer Preview)
+# AutoRAG
 
 **AutoRAG** on Red Hat OpenShift AI lets you run and evaluate **Retrieval-Augmented Generation (RAG)** over your documents from a **notebook** in the workbench. You provide documents and test questions; the notebook drives execution (using [IBM ai4rag](https://github.com/IBM/ai4rag)-style workflows) against a **Llama-stack RAG server** and lets you explore answers, retrieval, and metrics directly in the notebook. See [Example scenarios](#example-scenarios) for a typical use case and a step-by-step tutorial.
 

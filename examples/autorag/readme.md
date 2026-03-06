@@ -33,7 +33,7 @@ AutoRAG in this preview is **pipeline-driven**: you run the **Documents RAG Opti
 
 - **Document-based Q&A** — Your documents (e.g., PDFs or text) are stored in S3. The pipeline loads them, extracts text, and uses them as the knowledge base for RAG optimization and evaluation.
 - **Test data** — A `test_data.json` file (in S3) defines the questions and expected answers used to evaluate RAG configurations.
-- **RAG stack** — A **Llama-stack server** with the RAG stack (chat model, embedding model, vector store such as Milvus) is a prerequisite. See [Llama stack setup](../../llamastack/SETUP.md) for installation. The pipeline calls this stack for embedding, retrieval, and generation during optimization.
+- **RAG stack** — A **Llama-stack server** with the RAG stack (chat model, embedding model, vector store such as Milvus) is a prerequisite. See [Llama stack setup](../llama-stack/SETUP.md) for installation. The pipeline calls this stack for embedding, retrieval, and generation during optimization.
 - **Leaderboard and artifacts** — When the pipeline run completes, you get an HTML leaderboard of RAG patterns ranked by your chosen metric, plus per-pattern artifacts (pattern.json, evaluation_results.json, indexing and inference notebooks) that you can use to deploy or refine your RAG application.
 
 You run the pipeline via the AI Pipelines UI or API; no custom training code is required.
@@ -46,13 +46,13 @@ In this preview, AutoRAG is exposed as the **Documents RAG Optimization Pipeline
 |------|--------|
 | **Documents** | Stored in S3-compatible object storage (via RHOAI Connections). |
 | **Test data** | JSON file in S3 (e.g. `benchmark.json` or `test_data.json`): list of items with `question`, `correct_answers`, and `correct_answer_document_ids` for evaluation. |
-| **RAG stack** | Llama-stack server with RAG stack (chat model, embedding model, vector store e.g. Milvus). See [Llama stack setup](../../llamastack/SETUP.md). |
+| **RAG stack** | Llama-stack server with RAG stack (chat model, embedding model, vector store e.g. Milvus). See [Llama stack setup](../llama-stack/SETUP.md). |
 | **Execution** | [Documents RAG Optimization Pipeline](https://github.com/LukaszCmielowski/pipelines-components/tree/rhoai_autorag/pipelines/training/autorag/documents_rag_optimization_pipeline) via AI Pipelines UI or API. |
 | **What you get** | HTML leaderboard of RAG patterns, RAG pattern artifacts (pattern.json, evaluation results, indexing and inference notebooks). |
 
 ### How it works under the hood
 
-The **Documents RAG Optimization Pipeline** runs on **Kubeflow Pipelines** and uses **RHOAI Connections** (S3 secrets) to read documents and test data from S3. It calls the **Llama-stack RAG server** (deployed as a prerequisite in your project; see [Llama stack setup](../../llamastack/SETUP.md)) for embeddings, retrieval, and LLM responses. The pipeline stages: load test data and input documents, sample and extract text (e.g. Docling), prepare the search space, run RAG templates optimization (ai4rag), evaluate patterns, and produce the leaderboard and RAG pattern artifacts.
+The **Documents RAG Optimization Pipeline** runs on **Kubeflow Pipelines** and uses **RHOAI Connections** (S3 secrets) to read documents and test data from S3. It calls the **Llama-stack RAG server** (deployed as a prerequisite in your project; see [Llama stack setup](../llama-stack/SETUP.md)) for embeddings, retrieval, and LLM responses. The pipeline stages: load test data and input documents, sample and extract text (e.g. Docling), prepare the search space, run RAG templates optimization (ai4rag), evaluate patterns, and produce the leaderboard and RAG pattern artifacts.
 
 
 **RAG interaction pattern** — User question → retrieve context from grounding documents → LLM generates answer with that context.
@@ -159,8 +159,8 @@ To run the Documents RAG Optimization Pipeline, you provide:
 | **Documents** | Your source documents (e.g. IBM 2025 quarterly financial reports, one file per quarter) uploaded to an S3-compatible bucket. You can download quarterly earnings presentations (PDFs) from [IBM Financial Reporting](https://www.ibm.com/investor/financial-reporting) (select year 2025 and Q1–Q4). The pipeline ingests them for RAG optimization. |
 | **Test data** | A benchmark JSON file in S3 (e.g. `benchmark.json` or `test_data.json`). Format: a list of objects with `question`, `correct_answers` (list of strings), and `correct_answer_document_ids` (list of document IDs that should contain the answer). Document metadata in the extracted corpus must include `document_id` matching these IDs. |
 | **S3 connections** | RHOAI Connections for: (1) pipeline results/artifacts (used by the Pipeline Server), (2) one connection for both test data and input documents (same bucket, different object keys/paths). Use the same connection name for `test_data_secret_name` and `input_data_secret_name` in the pipeline run. |
-| **Llama-stack secret** | A Kubernetes secret (or connection) containing `LLAMA_STACK_CLIENT_BASE_URL` and `LLAMA_STACK_CLIENT_API_KEY` for the Llama-stack RAG server. See [Llama stack setup](../../llamastack/SETUP.md). The pipeline references it as `llama_stack_secret_name`. |
-| **RAG stack** | A Llama-stack server with the RAG stack enabled (chat model, embedding model, vector store such as Milvus), deployed in the project. See [Llama stack setup](../../llamastack/SETUP.md). |
+| **Llama-stack secret** | A Kubernetes secret (or connection) containing `LLAMA_STACK_CLIENT_BASE_URL` and `LLAMA_STACK_CLIENT_API_KEY` for the Llama-stack RAG server. See [Llama stack setup](../llama-stack/SETUP.md). The pipeline references it as `llama_stack_secret_name`. |
+| **RAG stack** | A Llama-stack server with the RAG stack enabled (chat model, embedding model, vector store such as Milvus), deployed in the project. See [Llama stack setup](../llama-stack/SETUP.md). |
 
 ### Optional
 
@@ -192,7 +192,7 @@ AutoRAG in this preview is aimed at **document Q&A and evaluation**: you have a 
 | **Internal docs Q&A** | Policy or product docs in S3; test questions in JSON | Same flow | Leaderboard and RAG pattern artifacts; use inference notebooks for Q&A. |
 | **Evaluation run** | Documents + test set with expected answers | Run pipeline | Compare patterns by metric (e.g. faithfulness, answer_correctness); deploy the best pattern. |
 
-To try this yourself, follow the [📚 Tutorial: Ask questions against 2025 IBM financial reports](financial_reports_tutorial.md): use the sample data in `data/financial_reports/` ([input_data/](data/financial_reports/input_data/) and [benchmark_data.json](data/financial_reports/benchmark_data.json); documents are sourced from [IBM Financial Reporting](https://www.ibm.com/investor/financial-reporting)), upload it to S3, ensure the [Llama stack is set up](../../llamastack/SETUP.md) and the RAG stack is ready, add and run the Documents RAG Optimization Pipeline, and view the leaderboard and RAG pattern artifacts.
+To try this yourself, follow the [📚 Tutorial: Ask questions against 2025 IBM financial reports](financial_reports_tutorial.md): use the sample data in `data/financial_reports/` ([input_data/](data/financial_reports/input_data/) and [benchmark_data.json](data/financial_reports/benchmark_data.json); documents are sourced from [IBM Financial Reporting](https://www.ibm.com/investor/financial-reporting)), upload it to S3, ensure the [Llama stack is set up](../llama-stack/SETUP.md) and the RAG stack is ready, add and run the Documents RAG Optimization Pipeline, and view the leaderboard and RAG pattern artifacts.
 
 ---
 
@@ -200,8 +200,8 @@ To try this yourself, follow the [📚 Tutorial: Ask questions against 2025 IBM 
 
 - **Red Hat OpenShift AI** installed and accessible, with **Kubeflow Pipelines** available.
 - A **data science project** and a **Pipeline Server** configured with object storage for runs and artifacts.
-- **Llama stack** set up — See [Llama stack setup](../../llamastack/SETUP.md) for installation and configuration.
-- **Llama-stack server with RAG stack** — Deploy and configure a Llama-stack server in the project with the RAG stack (chat model, embedding model, and vector store such as Milvus). Follow [Llama stack setup](../../llamastack/SETUP.md). The pipeline will use this server for retrieval and generation. See also [Deploying a RAG stack in a project](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.0/html/working_with_llama_stack/deploying-a-rag-stack-in-a-project_rag) and [Build AI/Agentic Applications with Llama Stack](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.2/html-single/working_with_llama_stack/working_with_llama_stack).
+- **Llama stack** set up — See [Llama stack setup](../llama-stack/SETUP.md) for installation and configuration.
+- **Llama-stack server with RAG stack** — Deploy and configure a Llama-stack server in the project with the RAG stack (chat model, embedding model, and vector store such as Milvus). Follow [Llama stack setup](../llama-stack/SETUP.md). The pipeline will use this server for retrieval and generation. See also [Deploying a RAG stack in a project](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.0/html/working_with_llama_stack/deploying-a-rag-stack-in-a-project_rag) and [Build AI/Agentic Applications with Llama Stack](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.2/html-single/working_with_llama_stack/working_with_llama_stack).
 - **S3 connections** (RHOAI Connections) for: (1) pipeline results/artifacts (Pipeline Server), (2) one connection for test data and input documents (same bucket, different keys/paths).
 - **Llama-stack secret** — A secret (or connection) with `LLAMA_STACK_CLIENT_BASE_URL` and `LLAMA_STACK_CLIENT_API_KEY` for the pipeline to call the RAG server.
 
@@ -211,7 +211,7 @@ To try this yourself, follow the [📚 Tutorial: Ask questions against 2025 IBM 
 
 You run AutoRAG by **running the Documents RAG Optimization Pipeline**:
 
-1. Ensure the **Llama-stack RAG stack** is deployed (see [Llama stack setup](../../llamastack/SETUP.md)) and that you have created a secret (or connection) with `LLAMA_STACK_CLIENT_BASE_URL` and `LLAMA_STACK_CLIENT_API_KEY` for the pipeline to use.
+1. Ensure the **Llama-stack RAG stack** is deployed (see [Llama stack setup](../llama-stack/SETUP.md)) and that you have created a secret (or connection) with `LLAMA_STACK_CLIENT_BASE_URL` and `LLAMA_STACK_CLIENT_API_KEY` for the pipeline to use.
 2. Ensure the **sample documents** from [data/financial_reports/input_data/](data/financial_reports/input_data/) and the **benchmark** file [benchmark_data.json](data/financial_reports/benchmark_data.json) are uploaded to S3 (same bucket, different paths), and that you have an S3 connection for that data plus a Pipeline Server configured with a results connection for artifacts.
 3. Add the **Documents RAG Optimization Pipeline** as a Pipeline Definition (from [pipelines-components](https://github.com/LukaszCmielowski/pipelines-components/tree/rhoai_autorag/pipelines/training/autorag/documents_rag_optimization_pipeline), branch `rhoai_autorag`).
 4. Create a pipeline run and set the required parameters: use the same connection and bucket for test data and input documents (different object keys); Llama-stack secret name; embeddings_models and generation_models lists; optimization_metric.
@@ -232,7 +232,7 @@ For a step-by-step walkthrough, see the [📚 Tutorial: Ask questions against 20
 ## References
 
 - [Documents RAG Optimization Pipeline](https://github.com/LukaszCmielowski/pipelines-components/tree/rhoai_autorag/pipelines/training/autorag/documents_rag_optimization_pipeline) — Pipeline definition, inputs, outputs, and artifact layout (branch `rhoai_autorag`)
-- [Llama stack setup](../../llamastack/SETUP.md) — Installation and configuration for the Llama-stack RAG server (prerequisite for AutoRAG)
+- [Llama stack setup](../llama-stack/SETUP.md) — Installation and configuration for the Llama-stack RAG server (prerequisite for AutoRAG)
 - [IBM ai4rag](https://github.com/IBM/ai4rag) — RAG templates and optimization engine used by the pipeline
 - [Deploying a RAG stack in a project (Red Hat OpenShift AI)](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.0/html/working_with_llama_stack/deploying-a-rag-stack-in-a-project_rag)
 - [Build AI/Agentic Applications with Llama Stack (Red Hat OpenShift AI)](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.2/html-single/working_with_llama_stack/working_with_llama_stack)

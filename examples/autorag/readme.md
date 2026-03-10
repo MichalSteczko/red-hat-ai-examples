@@ -12,7 +12,7 @@
   - [What AutoRAG gives you](#what-autorag-gives-you)
   - [What AutoRAG supports (Developer Preview)](#what-autorag-supports-developer-preview)
   - [How it works under the hood](#how-it-works-under-the-hood)
-  - [Sample notebook and experiment flow (ai4rag)](#sample-notebook-and-experiment-flow-ai4rag)
+  - [Pipeline flow](#pipeline-flow)
 - [What you need to provide](#what-you-need-to-provide)
   - [Required](#required)
   - [Optional](#optional)
@@ -68,7 +68,7 @@ flowchart LR
     style Answer fill:#2d8659,color:#fff,stroke-width:2px
 ```
 
-**Documents RAG optimization pipeline** — Kubeflow pipeline steps from the [documents RAG optimization pipeline](https://github.com/LukaszCmielowski/pipelines-components/tree/rhoai_autorag/pipelines/training/autorag/documents_rag_optimization_pipeline): load test data and input documents, sample and extract text, prepare the search space, run RAG templates optimization (HPO), then evaluate patterns on a leaderboard.
+**Documents RAG optimization pipeline** — Kubeflow pipeline steps from the [documents RAG optimization pipeline](https://github.com/LukaszCmielowski/pipelines-components/tree/rhoai_autorag/pipelines/training/autorag/documents_rag_optimization_pipeline); see [Pipeline flow](#pipeline-flow) below for the stage list.
 
 ```mermaid
 flowchart LR
@@ -184,15 +184,18 @@ Artifacts are stored in the artifact store configured for your run (e.g. S3 via 
 
 ## Example scenarios
 
-AutoRAG in this preview is aimed at **document Q&A and evaluation**: you have a set of documents (e.g. reports, manuals) and a list of questions; you run the notebook to get answers and inspect retrieval and quality.
+AutoRAG in this preview is aimed at **document Q&A and evaluation**: you have a set of documents (e.g. policies, manuals, contracts) and a list of questions with expected answers; you run the **Documents RAG Optimization Pipeline** to find the best RAG configuration and then use the generated artifacts (leaderboard, inference notebooks) to power search, chatbots, or internal tools.
+
+In each scenario you run the same pipeline; only the document set and test data change.
 
 | Scenario | Your data | What you do | Outcome |
 |----------|-----------|-------------|---------|
-| **Financial reports Q&A** | Sample data in `data/financial_reports/`: input documents in [input_data/](data/financial_reports/input_data/) and [benchmark_data.json](data/financial_reports/benchmark_data.json) (sourced from [IBM Financial Reporting](https://www.ibm.com/investor/financial-reporting)) | Run the Documents RAG Optimization Pipeline against the Llama-stack RAG server | Leaderboard of RAG patterns; pattern configs and notebooks for deployment. |
-| **Internal docs Q&A** | Policy or product docs in S3; test questions in JSON | Same flow | Leaderboard and RAG pattern artifacts; use inference notebooks for Q&A. |
-| **Evaluation run** | Documents + test set with expected answers | Run pipeline | Compare patterns by metric (e.g. faithfulness, answer_correctness); deploy the best pattern. |
+| **Compliance and policy Q&A** | Policy documents, standards, handbooks (PDF/text) in S3; benchmark JSON with questions and expected answers (e.g. "What is the approval process for X?", "Which policy covers Y?") | Upload docs and benchmark to S3; run the pipeline; evaluate patterns by faithfulness and answer correctness | Leaderboard of RAG patterns; deploy the best pattern so HR, legal, or compliance can query policies with traceable, cited answers. |
+| **Technical support knowledge base** | Product documentation, runbooks, KB articles in S3; benchmark with common support questions and known-good answers | Run the pipeline; compare retrieval and generation quality across patterns | Best RAG configuration for support chatbots, agent-facing search, or self-service portals; use inference notebooks to embed Q&A in your tooling. |
+| **Contract and procurement review** | Contracts, RFPs, vendor documentation in S3; benchmark with clause-level Q&As (obligations, deadlines, terms) | Run the pipeline with your document set and test questions; pick metric (e.g. context_correctness, faithfulness) | Ranked leaderboard; legal or procurement teams use the best-pattern indexing + inference notebooks for contract search and clause lookup. |
+| **Financial and investor reporting** | Quarterly reports, earnings materials, investor decks in S3; benchmark with questions and expected answers (sample data in `data/financial_reports/`: [input_data/](data/financial_reports/input_data/) and [benchmark_data.json](data/financial_reports/benchmark_data.json), sourced from [IBM Financial Reporting](https://www.ibm.com/investor/financial-reporting)) | Upload to S3; run the pipeline against the Llama-stack RAG server | Leaderboard and RAG pattern artifacts; finance or IR teams use the best-pattern inference notebook for report Q&A. |
 
-To try this yourself, follow the [📚 Tutorial: Ask questions against 2025 IBM financial reports](financial_reports_tutorial.md): use the sample data in `data/financial_reports/` ([input_data/](data/financial_reports/input_data/) and [benchmark_data.json](data/financial_reports/benchmark_data.json); documents are sourced from [IBM Financial Reporting](https://www.ibm.com/investor/financial-reporting)), upload it to S3, ensure the [Llama stack is set up](../llama-stack/SETUP.md) and the RAG stack is ready, add and run the Documents RAG Optimization Pipeline, and view the leaderboard and RAG pattern artifacts.
+**Try it with sample data:** Follow the [📚 Tutorial: Ask questions against 2025 IBM financial reports](financial_reports_tutorial.md). Use the data in `data/financial_reports/` ([input_data/](data/financial_reports/input_data/) and [benchmark_data.json](data/financial_reports/benchmark_data.json); documents are sourced from [IBM Financial Reporting](https://www.ibm.com/investor/financial-reporting)). Upload to S3, ensure the [Llama stack is set up](../llama-stack/SETUP.md) and the RAG stack is ready, add and run the Documents RAG Optimization Pipeline, then view the leaderboard and RAG pattern artifacts.
 
 ---
 
@@ -218,8 +221,6 @@ You run AutoRAG by **running the Documents RAG Optimization Pipeline**:
 5. **View the results** in the run's Artifacts: leaderboard HTML and RAG pattern artifacts (pattern.json, evaluation_results.json, indexing and inference notebooks).
 
 For a step-by-step walkthrough, see the [📚 Tutorial: Ask questions against 2025 IBM financial reports](financial_reports_tutorial.md).
-
----
 
 ## 📚 Tutorial: Ask questions against 2025 IBM financial reports
 

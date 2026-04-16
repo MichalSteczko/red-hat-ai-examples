@@ -56,16 +56,37 @@
     "correct_answer_document_ids": ["rh_summit_2026_20260513.md"]
   },
   {
-    "question": "What open source projects were highlighted in the Community Day AI track kickoff session about enterprise AI?",
+    "question": "I'm interested in AutoRAG—what session should I attend at Red Hat Summit 2026?",
     "correct_answers": [
-      "The session highlighted open source projects including vLLM, PyTorch, llm-d, Kubeflow, and KServe as projects that are democratizing access to AI, fostering collaboration while providing transparency in the enterprise AI landscape."
+      "Attend the Thursday breakout \"Stop guessing, start shipping: Automated RAG pattern discovery with Red Hat AI\" (session code BO2036). It is a 40-minute breakout from 09:45 AM to 10:25 AM in room B404 - Level 4, covering AutoRAG and AutoML in Red Hat AI, including how AutoRAG explores the configuration space with your documents and test data to deliver ranked, production-ready RAG code."
     ],
-    "correct_answer_document_ids": ["rh_summit_2026_20260511.md"]
+    "correct_answer_document_ids": ["rh_summit_2026_20260514.md"]
   },
   {
-    "question": "How did Westpac use Event-Driven Ansible for AIOps in banking operations?",
+    "question": "I want to learn about multilingual RAG and improving a corporate RAG chatbot on OpenShift AI—which session fits?",
     "correct_answers": [
-      "Westpac combined Event-Driven Ansible with AIOps to enhance operational responsiveness and comply with threat and resilience management regulations. They transformed millions of system events into intelligent actions by automating event detection, response, and remediation, achieving substantial improvements to incident resolution, operational risk, and platform resilience in enterprise banking."
+      "Choose the Thursday breakout \"Retrieval-augmented generation (RAG) in a real multilingual scenario: Challenges and solutions using Red Hat OpenShift AI\" (BO2847), 09:45 AM to 10:25 AM in B407 - Level 4. BBVA and Red Hat cover multilingual RAG challenges, agentic RAG, evaluation with RAGAS, GPU-as-a-Service, and testing llm-d for efficiency."
+    ],
+    "correct_answer_document_ids": ["rh_summit_2026_20260514.md"]
+  },
+  {
+    "question": "I'm focused on observability for multi-agent AI with MCP and LangChain—what hands-on session should I book?",
+    "correct_answers": [
+      "Book the Wednesday lab \"AgentOps in production: Agentic end-to-end observability with Red Hat AI\" (LB2144), 10:30 AM to 12:00 PM in A315 - Level 3. It is a 90-minute lab on observing and tracing multi-agent apps on Red Hat AI, including LangGraph/LangChain with MCP tools, MLflow tracing, and LLM evaluations."
+    ],
+    "correct_answer_document_ids": ["rh_summit_2026_20260513.md"]
+  },
+  {
+    "question": "I need a lab on llm-d and scalable LLM inference on Kubernetes—which session should I attend?",
+    "correct_answers": [
+      "Attend the Wednesday lab \"Introducing llm-d: Your production-ready path to scalable LLM inference\" (LB2861), 01:00 PM to 02:30 PM in A311 - Level 3. The 90-minute workshop covers llm-d with vLLM, Inference Gateway routing, Kubernetes patterns for large models, and hands-on deployment and optimization."
+    ],
+    "correct_answer_document_ids": ["rh_summit_2026_20260513.md"]
+  },
+  {
+    "question": "I'm looking for a short talk on scaling RAG with Postgres on OpenShift—any recommendations?",
+    "correct_answers": [
+      "Attend the Wednesday lightning talk \"Building Scalable RAG Architectures with EnterpriseDB, OpenShift, and OpenShift AI\" (LT2808), 11:40 AM to 12:00 PM in the Developer Zone. It covers EnterpriseDB Postgres for Kubernetes as a vector store with OpenShift AI for inference and includes a live end-to-end demo."
     ],
     "correct_answer_document_ids": ["rh_summit_2026_20260513.md"]
   }

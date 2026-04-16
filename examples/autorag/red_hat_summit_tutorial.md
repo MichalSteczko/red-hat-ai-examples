@@ -160,7 +160,7 @@ Sample data is provided in this repository under **`data/rh_summit_2026/`**: inp
 
 For exact artifact paths and layout, see the [documents_rag_optimization_pipeline](https://github.com/red-hat-data-services/pipelines-components/tree/main/pipelines/training/autorag/documents_rag_optimization_pipeline) README (Outputs and "Files stored in user storage" sections).
 
-**Step 3 Locate best pattern directory inside your S3 storage (Pattern 1 in this case) and review the generated files:**
+**Step 3 Locate best pattern directory inside your S3 storage (pattern 8 in this case) and review the generated files:**
 <a id="generated-files"></a>
 ![Pipeline Generated Files](images/generated_files.png)
 
@@ -195,7 +195,7 @@ Each RAG pattern in the **rag_patterns_artifact** includes two generated noteboo
 **Step ⑤ Run `inference.ipynb` notebook:**
 ![inference notebook](images/inference_nb.png)
 
-Test your own questions against the generated RAG Pattern at the end of the notebook.
+Test your own questions against the generated RAG pattern at the end of the notebook.
 
 ![RAG Query result](images/rag_query_response.png)
 The **inference.ipynb** is the main interface for querying your RAG system; the **indexing.ipynb** is needed when you first deploy a pattern or when you add or update documents in the index. For more detail on the contents of each notebook and the pattern configuration, see the [documents_rag_optimization_pipeline](https://github.com/red-hat-data-services/pipelines-components/tree/main/pipelines/training/autorag/documents_rag_optimization_pipeline) README.

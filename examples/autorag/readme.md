@@ -20,7 +20,7 @@
 - [Example scenarios](#example-scenarios)
 - [Prerequisites](#prerequisites)
 - [Running AutoRAG](#running-autorag)
-- [Tutorial: Ask questions against 2025 IBM financial reports](financial_reports_tutorial.md)
+- [Tutorial: Ask questions against Red Hat Summit 2026 schedule](red_hat_summit_tutorial.md)
 - [References](#references)
 
 ---
@@ -31,7 +31,7 @@
 
 AutoRAG in this preview is **pipeline-driven**: you run the **Documents RAG Optimization Pipeline** on Red Hat OpenShift AI. The pipeline loads your documents and test data from S3, runs RAG configuration optimization (ai4rag) against a **Llama-stack RAG server**, and produces a leaderboard and RAG pattern artifacts.
 
-- **Document-based Q&A** — Your documents (e.g., PDFs or text) are stored in S3. The pipeline loads them, extracts text, and uses them as the knowledge base for RAG optimization and evaluation.
+- **Document-based Q&A** — Your documents (e.g., PDFs, MDs or text) are stored in S3. The pipeline loads them, extracts text, and uses them as the knowledge base for RAG optimization and evaluation.
 - **Test data** — A `benchmark_data.json` file (in S3) defines the questions and expected answers used to evaluate RAG configurations.
 - **RAG stack** — A **Llama-stack server** with the RAG stack (chat model, embedding model, vector store such as Milvus) is a prerequisite. See [Llama stack setup](https://github.com/red-hat-data-services/red-hat-ai-examples/blob/llama-stack_sample/examples/llama-stack/SETUP.md) for installation. The pipeline calls this stack for embedding, retrieval, and generation during optimization.
 - **Leaderboard and artifacts** — When the pipeline run completes, you get an HTML leaderboard of RAG patterns ranked by your chosen metric, plus per-pattern artifacts (pattern.json, evaluation_results.json, indexing and inference notebooks) that you can use to deploy or refine your RAG application.
@@ -155,7 +155,7 @@ To run the Documents RAG Optimization Pipeline, you provide:
 
 | Item | Description |
 |------|-------------|
-| **Documents** | Your source documents (e.g. IBM 2025 quarterly financial reports, one file per quarter) uploaded to an S3-compatible bucket. You can download quarterly earnings presentations (PDFs) from [IBM Financial Reporting](https://www.ibm.com/investor/financial-reporting) (select year 2025 and Q1–Q4). The pipeline ingests them for RAG optimization. |
+| **Documents** | Your source documents (e.g. Red Hat Summit schedule, one file per this event day) uploaded to an S3-compatible bucket. You can find this schedule at [Red Hat Summit 2026](https://events.experiences.redhat.com/widget/redhat/sum26/SessionCatalog2026?tab.day=20260511). The pipeline ingests them for RAG optimization. |
 | **Test data** | A benchmark JSON file in S3 (e.g. `benchmark_data.json` or `test_data.json`). Format: a list of objects with `question`, `correct_answers` (list of strings), and `correct_answer_document_ids` (list of document IDs that should contain the answer). Document metadata in the extracted corpus must include `document_id` matching these IDs. |
 | **S3 connections** | RHOAI Connections for: (1) pipeline results/artifacts (used by the Pipeline Server), (2) one connection for both test data and input documents (same bucket, different object keys/paths). Use the same connection name for `test_data_secret_name` and `input_data_secret_name` in the pipeline run. |
 | **Llama-stack secret** | A Kubernetes secret (or connection) containing `LLAMA_STACK_CLIENT_BASE_URL` and `LLAMA_STACK_CLIENT_API_KEY` for the Llama-stack RAG server. See [Llama stack setup](https://github.com/red-hat-data-services/red-hat-ai-examples/blob/llama-stack_sample/examples/llama-stack/SETUP.md). The pipeline references it as `llama_stack_secret_name`. |
@@ -189,12 +189,12 @@ In each scenario you run the same pipeline; only the document set and test data 
 
 | Scenario | Your data | What you do | Outcome |
 |----------|-----------|-------------|---------|
-| **Compliance and policy Q&A** | Policy documents, standards, handbooks (PDF/text) in S3; benchmark JSON with questions and expected answers (e.g. "What is the approval process for X?", "Which policy covers Y?") | Upload docs and benchmark to S3; run the pipeline; evaluate patterns by faithfulness and answer correctness | Leaderboard of RAG patterns; deploy the best pattern so HR, legal, or compliance can query policies with traceable, cited answers. |
+| **Compliance and policy Q&A** | Policy documents, standards, handbooks (MD/text) in S3; benchmark JSON with questions and expected answers (e.g. "What is the approval process for X?", "Which policy covers Y?") | Upload docs and benchmark to S3; run the pipeline; evaluate patterns by faithfulness and answer correctness | Leaderboard of RAG patterns; deploy the best pattern so HR, legal, or compliance can query policies with traceable, cited answers. |
 | **Technical support knowledge base** | Product documentation, runbooks, KB articles in S3; benchmark with common support questions and known-good answers | Run the pipeline; compare retrieval and generation quality across patterns | Best RAG configuration for support chatbots, agent-facing search, or self-service portals; use inference notebooks to embed Q&A in your tooling. |
 | **Contract and procurement review** | Contracts, RFPs, vendor documentation in S3; benchmark with clause-level Q&As (obligations, deadlines, terms) | Run the pipeline with your document set and test questions; pick metric (e.g. context_correctness, faithfulness) | Ranked leaderboard; legal or procurement teams use the best-pattern indexing + inference notebooks for contract search and clause lookup. |
-| **Financial and investor reporting** | Quarterly reports, earnings materials, investor decks in S3; benchmark with questions and expected answers (sample data in `data/financial_reports/`: [input_data/](data/financial_reports/input_data/) and [benchmark_data.json](data/financial_reports/benchmark_data.json), sourced from [IBM Financial Reporting](https://www.ibm.com/investor/financial-reporting)) | Upload to S3; run the pipeline against the Llama-stack RAG server | Leaderboard and RAG pattern artifacts; finance or IR teams use the best-pattern inference notebook for report Q&A. |
+| **Financial and investor reporting** | Quarterly reports, earnings materials, investor decks in S3; benchmark with questions and expected answers (sample data in `data/rh_summit_2026/`: [input_data/](data/rh_summit_2026/input_data/) and [benchmark_data.json](data/rh_summit_2026/benchmark_data.json), sourced from [Red Hat Summit 2026](https://events.experiences.redhat.com/widget/redhat/sum26/SessionCatalog2026?tab.day=20260511)) | Upload to S3; run the pipeline against the Llama-stack RAG server | Leaderboard and RAG pattern artifacts; finance or IR teams use the best-pattern inference notebook for report Q&A. |
 
-**Try it with sample data:** Follow the [Tutorial: Ask questions against 2025 IBM financial reports](financial_reports_tutorial.md). Use the data in `data/financial_reports/` ([input_data/](data/financial_reports/input_data/) and [benchmark_data.json](data/financial_reports/benchmark_data.json); documents are sourced from [IBM Financial Reporting](https://www.ibm.com/investor/financial-reporting)). Upload to S3, ensure the [Llama stack is set up](https://github.com/red-hat-data-services/red-hat-ai-examples/blob/llama-stack_sample/examples/llama-stack/SETUP.md) and the RAG stack is ready, add and run the Documents RAG Optimization Pipeline, then view the leaderboard and RAG pattern artifacts.
+**Try it with sample data:** Follow the [Tutorial: Ask questions against Red Hat Summit 2026](red_hat_summit_tutorial.md). Use the data in `data/rh_summit_2026/` ([input_data/](data/rh_summit_2026/input_data/) and [benchmark_data.json](data/rh_summit_2026/benchmark_data.json); documents are sourced from [Red Hat Summit 2026](https://events.experiences.redhat.com/widget/redhat/sum26/SessionCatalog2026?tab.day=20260511)). Upload to S3, ensure the [Llama stack is set up](https://github.com/red-hat-data-services/red-hat-ai-examples/blob/llama-stack_sample/examples/llama-stack/SETUP.md) and the RAG stack is ready, add and run the Documents RAG Optimization Pipeline, then view the leaderboard and RAG pattern artifacts.
 
 ---
 
@@ -213,18 +213,18 @@ In each scenario you run the same pipeline; only the document set and test data 
 You run AutoRAG by **running the Documents RAG Optimization Pipeline**:
 
 1. Ensure the **Llama-stack RAG stack** is deployed (see [Llama stack setup](https://github.com/red-hat-data-services/red-hat-ai-examples/blob/llama-stack_sample/examples/llama-stack/SETUP.md)) and that you have created a secret (or connection) with `LLAMA_STACK_CLIENT_BASE_URL` and `LLAMA_STACK_CLIENT_API_KEY` for the pipeline to use.
-2. Ensure the **sample documents** from [data/financial_reports/input_data/](data/financial_reports/input_data/) and the **benchmark** file [benchmark_data.json](data/financial_reports/benchmark_data.json) are uploaded to S3 (same bucket, different paths), and that you have an S3 connection for that data plus a Pipeline Server configured with a results connection for artifacts.
+2. Ensure the **sample documents** from [data/rh_summit_2026/input_data/](data/rh_summit_2026/input_data/) and the **benchmark** file [benchmark_data.json](data/rh_summit_2026/benchmark_data.json) are uploaded to S3 (same bucket, different paths), and that you have an S3 connection for that data plus a Pipeline Server configured with a results connection for artifacts.
 3. Add the **Documents RAG Optimization Pipeline** as a Pipeline Definition (from [pipelines-components](https://github.com/red-hat-data-services/pipelines-components/tree/main/pipelines/training/autorag/documents_rag_optimization_pipeline), branch `autox`). You can find it's compiled version [here](pipelines/pipeline.yaml).
 4. Create a pipeline run and set the required parameters: use the same connection and bucket for test data and input documents (different object keys); Llama-stack secret name; embeddings_models and generation_models lists; optimization_metric.
 5. **View the results** in the run's Artifacts: leaderboard HTML and RAG pattern artifacts (pattern.json, evaluation_results.json, indexing and inference notebooks).
 
-For a step-by-step walkthrough, see the [Tutorial: Ask questions against 2025 IBM financial reports](financial_reports_tutorial.md).
+For a step-by-step walkthrough, see the [Tutorial: Ask questions against Red Hat Summit 2026](red_hat_summit_tutorial.md).
 
-## Tutorial: Ask questions against 2025 IBM financial reports
+## Tutorial: Ask questions against Red Hat Summit 2026
 
-**Scenario:** You use the **sample data** in `data/financial_reports/`: **input documents** (IBM financial reports) in `input_data/` and **benchmark_data.json** with questions (sourced from [IBM Financial Reporting](https://www.ibm.com/investor/financial-reporting)). The goal is to run the **Documents RAG Optimization Pipeline** on Red Hat OpenShift AI against a **Llama-stack RAG server**, then view the leaderboard and RAG pattern artifacts (configs, evaluation results, indexing and inference notebooks).
+**Scenario:** You use the **sample data** in `data/rh_summit_2026/`: **input documents** (Red Hat Summit 2026) in `input_data/` and **benchmark_data.json** with questions (sourced from [Red Hat Summit 2026](https://events.experiences.redhat.com/widget/redhat/sum26/SessionCatalog2026?tab.day=20260511)). The goal is to run the **Documents RAG Optimization Pipeline** on Red Hat OpenShift AI against a **Llama-stack RAG server**, then view the leaderboard and RAG pattern artifacts (configs, evaluation results, indexing and inference notebooks).
 
-**Step-by-step guide:** The full tutorial walks you through creating a project, deploying the Llama-stack server with the RAG stack, creating S3 and Llama-stack connections, uploading documents and test data to S3, adding the Documents RAG Optimization Pipeline as a Pipeline Definition, running the pipeline with the required parameters, and viewing the leaderboard and RAG pattern artifacts. Follow the tutorial here: **[Financial reports tutorial](financial_reports_tutorial.md)**.
+**Step-by-step guide:** The full tutorial walks you through creating a project, deploying the Llama-stack server with the RAG stack, creating S3 and Llama-stack connections, uploading documents and test data to S3, adding the Documents RAG Optimization Pipeline as a Pipeline Definition, running the pipeline with the required parameters, and viewing the leaderboard and RAG pattern artifacts. Follow the tutorial here: **[Red Hat Summit 2026 tutorial](red_hat_summit_tutorial.md)**.
 
 ---
 

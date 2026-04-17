@@ -1,6 +1,6 @@
-# 📚 Tutorial: Ask questions against IBM financial reports
+# 📚 Tutorial: Ask questions against Red Hat Summit 2026 schedule
 
-**Scenario:** You use the **sample data** provided in this repository under `data/financial_reports/`: **input documents** (IBM financial reports, e.g. quarterly PDFs) in `input_data/` and **benchmark_data.json** (questions and expected answers) in the same folder. These documents are sourced from [IBM Financial Reporting](https://www.ibm.com/investor/financial-reporting) (for context and to obtain additional reports if needed). The goal is to run the **Documents RAG Optimization Pipeline** on Red Hat OpenShift AI: upload the provided data to S3, run the pipeline against a **Llama-stack RAG server**, and get a **leaderboard** of RAG patterns plus artifacts (e.g. pattern configs, evaluation results, indexing and inference notebooks) for production RAG.
+**Scenario:** You use the **sample data** provided in this repository under `data/rh_summit_2026/`: **input documents** (Red Hat Summit 2026 schedule) in `input_data/` and **benchmark_data.json** (questions and expected answers) in the same folder. These documents are sourced from [Red Hat Summit 2026](https://events.experiences.redhat.com/widget/redhat/sum26/SessionCatalog2026?tab.day=20260511). The goal is to run the **Documents RAG Optimization Pipeline** on Red Hat OpenShift AI: upload the provided data to S3, run the pipeline against a **Llama-stack RAG server**, and get a **leaderboard** of RAG patterns plus artifacts (e.g. pattern configs, evaluation results, indexing and inference notebooks) for production RAG.
 
 This tutorial walks you through: creating a project, creating S3 connections for pipeline results and for test/data, ensuring the [Llama stack is set up](https://github.com/red-hat-data-services/red-hat-ai-examples/blob/llama-stack_sample/examples/llama-stack/SETUP.md) and the RAG stack is deployed, adding the `documents_rag_optimization_pipeline` as a Pipeline Definition, running the pipeline with the required parameters, and viewing the leaderboard and RAG pattern artifacts.
 
@@ -24,7 +24,7 @@ This tutorial walks you through: creating a project, creating S3 connections for
 | Step | Action |
 |------|--------|
 | **①** | Log in to Red Hat OpenShift AI. |
-| **②** | Go to **Data science projects** and create a new project (e.g. `ibm-reports-rag`). |
+| **②** | Go to **Data science projects** and create a new project (e.g. `red-hat-summit-rag`). |
 | **③** | Configure a **Pipeline Server** for the project with object storage for runs and artifacts (you will use the results S3 connection from [Create S3 connections](#create-s3-connections) when configuring the Pipeline Server). For full steps, see [Creating a project and workbench](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/2.8/html/getting_started_with_red_hat_openshift_ai_self-managed/creating-a-project-workbench_get-started) and pipeline runtime configuration in the Red Hat OpenShift AI documentation. |
 
 <a id="deploy-llama-stack-server-with-rag-stack"></a>
@@ -72,7 +72,7 @@ Create S3-compatible connections so the pipeline can read test data and input do
 
 | Step | Action |
 |------|--------|
-| **①** | Create one **S3 compatible object storage** connection pointing to the bucket (and credentials) where you will upload both the **benchmark file** (`data/financial_reports/benchmark_data.json`) and the **input documents** (`data/financial_reports/input_data/`). The connection must expose credentials that include `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_S3_ENDPOINT`, and `AWS_DEFAULT_REGION` (or equivalent) as expected by the pipeline. Use different object keys (paths) in that bucket for the benchmark file and for the input documents folder. |
+| **①** | Create one **S3 compatible object storage** connection pointing to the bucket (and credentials) where you will upload both the **benchmark file** (`data/rh_summit_2026/benchmark_data.json`) and the **input documents** (`data/rh_summit_2026/input_data/`). The connection must expose credentials that include `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_S3_ENDPOINT`, and `AWS_DEFAULT_REGION` (or equivalent) as expected by the pipeline. Use different object keys (paths) in that bucket for the benchmark file and for the input documents folder. |
 
 **Note:** Use the same **Connection name** for both `test_data_secret_name` and `input_data_secret_name` in the pipeline run. Use the same **bucket name** for both `test_data_bucket_name` and `input_data_bucket_name`; set `test_data_key` to the path of the benchmark file and `input_data_key` to the path (prefix) of the input documents.
 
@@ -99,12 +99,12 @@ Create S3-compatible connections so the pipeline can read test data and input do
 
 ## ⬆️ Upload documents and test data to S3
 
-Sample data is provided in this repository under **`data/financial_reports/`**: input documents (PDFs) in [data/financial_reports/input_data/](data/financial_reports/input_data/) and the benchmark file [data/financial_reports/benchmark_data.json](data/financial_reports/benchmark_data.json). The documents are sourced from [IBM Financial Reporting](https://www.ibm.com/investor/financial-reporting) (under **Find a quarterly earnings presentation**, year **2025**, Q1–Q4; you can use that page to obtain additional reports if needed).
+Sample data is provided in this repository under **`data/rh_summit_2026/`**: input documents (MDs) in [data/rh_summit_2026/input_data/](data/rh_summit_2026/input_data/) and the benchmark file [data/rh_summit_2026/benchmark_data.json](data/rh_summit_2026/benchmark_data.json). The documents are created based on [Red Hat Summit 2026](https://events.experiences.redhat.com/widget/redhat/sum26/SessionCatalog2026?tab.day=20260511) schedule.
 
 | Step | Action |
 |------|--------|
-| **①** | Upload the **input documents** from [data/financial_reports/input_data/](data/financial_reports/input_data/) to your S3 data bucket attached with **workbench** created in the previous step. Place the PDFs in a path you will use as the object key or prefix (e.g. `documents/2025/` or `input_data/`). Note the **bucket name** and **object key** (path or prefix) for `input_data_bucket_name` and `input_data_key`. |
-| **②** | Upload **[benchmark_data.json](data/financial_reports/benchmark_data.json)** from `data/financial_reports/` to the **same** S3 bucket, in a different path (e.g. `data/financial_reports/benchmark_data.json` or `benchmark_data.json`). Note the **object key** (path) for `test_data_key`; use the same bucket name for `test_data_bucket_name`. |
+| **①** | Upload the **input documents** from [data/rh_summit_2026/input_data/](data/rh_summit_2026/input_data/) to your S3 data bucket attached with **workbench** created in the previous step. Place the MDs in a path you will use as the object key or prefix (e.g. `documents/` or `input_data/`). Note the **bucket name** and **object key** (path or prefix) for `input_data_bucket_name` and `input_data_key`. |
+| **②** | Upload **[benchmark_data.json](data/rh_summit_2026/benchmark_data.json)** from `data/rh_summit_2026/` to the **same** S3 bucket, in a different path (e.g. `data/rh_summit_2026/benchmark_data.json` or `benchmark_data.json`). Note the **object key** (path) for `test_data_key`; use the same bucket name for `test_data_bucket_name`. |
 
 **Example data layout inside S3 storage**
 ![S3 storage](images/documents_tree.png)
@@ -128,7 +128,7 @@ Sample data is provided in this repository under **`data/financial_reports/`**: 
 | Step | Action |
 |------|--------|
 | **①** | From **Pipelines**, create a new pipeline run using **Pipeline definitions → ⋮ → Create run** for the Documents RAG Optimization Pipeline you added. |
-| **②** | Set the **Name** of the run and the following run parameters (see the [pipeline README](https://github.com/red-hat-data-services/pipelines-components/tree/main/pipelines/training/autorag/documents_rag_optimization_pipeline) for full descriptions): **test_data_secret_name** and **input_data_secret_name** (same connection name from the single S3 data connection), **test_data_bucket_name** and **input_data_bucket_name** (same bucket), **test_data_key** (path to the benchmark file, e.g. `benchmark_data.json`), **input_data_key** (path to documents folder or prefix, e.g. `input_data/`), **llama_stack_secret_name** (secret with `LLAMA_STACK_CLIENT_BASE_URL` and `LLAMA_STACK_CLIENT_API_KEY`), **embeddings_models** (list of embedding model identifiers to try, e.g. `["ibm/slate-125m-english-rtrvr-v2", "intfloat/multilingual-e5-large"]`), **generation_models** (list of foundation/generation model identifiers, e.g. `["mistralai/mixtral-8x7b-instruct-v01", "ibm/granite-13b-instruct-v2"]`), **optimization_metric** (e.g. `faithfulness`, `answer_correctness`, or `context_correctness`; default `faithfulness`). Optionally set **llama_stack_vector_database_id** (e.g. `ls_milvus`; default is `ls_milvus`). |
+| **②** | Set the **Name** of the run and the following run parameters (see the [pipeline README](https://github.com/red-hat-data-services/pipelines-components/tree/main/pipelines/training/autorag/documents_rag_optimization_pipeline) for full descriptions): **test_data_secret_name** and **input_data_secret_name** (same connection name from the single S3 data connection), **test_data_bucket_name** and **input_data_bucket_name** (same bucket), **test_data_key** (path to the benchmark file, e.g. `benchmark_data.json`), **input_data_key** (path to documents folder or prefix, e.g. `input_data/`), **llama_stack_secret_name** (secret with `LLAMA_STACK_CLIENT_BASE_URL` and `LLAMA_STACK_CLIENT_API_KEY`), **embeddings_models** (list of embedding model identifiers to try, e.g. `["ibm/slate-125m-english-rtrvr-v2", "intfloat/multilingual-e5-large"]`), **generation_models** (list of foundation/generation model identifiers, e.g. `["mistralai/mixtral-8x7b-instruct-v01", "ibm/granite-13b-instruct-v2"]`), **optimization_metric** (e.g. `faithfulness`, `answer_correctness`, or `context_correctness`; default `faithfulness`). </br> <span style="color:red">**Set `llama_stack_vector_database_id` (e.g. `ls_milvus`; default is `ls_milvus`) and please note that only `inline::milvus` provider type is currently supported**.</span> |
 | **③** | Ensure the **Pipeline Server** is configured with the results S3 connection from [Create S3 connections](#create-s3-connections), so artifacts are stored in the expected bucket. |
 | **④** | Start the run via **Create run** and wait for it to complete. |
 
@@ -160,7 +160,7 @@ Sample data is provided in this repository under **`data/financial_reports/`**: 
 
 For exact artifact paths and layout, see the [documents_rag_optimization_pipeline](https://github.com/red-hat-data-services/pipelines-components/tree/main/pipelines/training/autorag/documents_rag_optimization_pipeline) README (Outputs and "Files stored in user storage" sections).
 
-**Step 3 Locate best pattern directory inside your S3 storage (Pattern 1 in this case) and review the generated files:**
+**Step 3 Locate best pattern directory inside your S3 storage (pattern 8 in this case) and review the generated files:**
 <a id="generated-files"></a>
 ![Pipeline Generated Files](images/generated_files.png)
 
@@ -195,4 +195,7 @@ Each RAG pattern in the **rag_patterns_artifact** includes two generated noteboo
 **Step ⑤ Run `inference.ipynb` notebook:**
 ![inference notebook](images/inference_nb.png)
 
+Test your own questions against the generated RAG pattern at the end of the notebook.
+
+![RAG Query result](images/rag_query_response.png)
 The **inference.ipynb** is the main interface for querying your RAG system; the **indexing.ipynb** is needed when you first deploy a pattern or when you add or update documents in the index. For more detail on the contents of each notebook and the pattern configuration, see the [documents_rag_optimization_pipeline](https://github.com/red-hat-data-services/pipelines-components/tree/main/pipelines/training/autorag/documents_rag_optimization_pipeline) README.

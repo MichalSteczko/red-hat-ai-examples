@@ -82,17 +82,30 @@ Create S3-compatible connections so the pipeline can read test data and input do
 
 | Step | Action |
 |------|--------|
+| **⓪** | ‼️ This step is applicable only for disconnected environment. <br/> Mirror the [pipeline-components](https://github.com/opendatahub-io/pipelines-components) GitHub repository into your Git server on `bastion node`. |
 | **①** | In the project, go to **Workbenches** and create a **Workbench** (notebook environment). Choose an image and resource size as needed. |
-| **②** | During workbench setup, use **Attach existing connections** to attach the **Llama-stack** connection (from [Create Llama-stack connection](#create-llama-stack-connection-secret)) and the **S3 data** connection (from [Create S3 connections](#create-s3-connections)) used for test data and input documents. |
-| **③** | Save and launch the workbench. For full steps, see [Creating a project and workbench](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/2.8/html/getting_started_with_red_hat_openshift_ai_self-managed/creating-a-workbench-select-ide_get-started) in the Red Hat OpenShift AI documentation. |
+| **②** | ‼️ This step is applicable only for the disconnected environment. <br/> Add the following env variables to your workbench: <br/> - PIP_INDEX_URL=`<YOUR-BASTION-NODE-URL›:<PYPI-SERVER-PORT>/root/pypi/+simple/` <br/> - PIP_TRUSTED_HOST=`<YOUR-BASTION-NODE-URL>` <br/> -GIT_SSL_NO_VERIFY=`true`
+|
+| **③** | During workbench setup, use **Attach existing connections** to attach the **Llama-stack** connection (from [Create Llama-stack connection](#create-llama-stack-connection-secret)) and the **S3 data** connection (from [Create S3 connections](#create-s3-connections)) used for test data and input documents. |
+| **④** | Save and launch the workbench. For full steps, see [Creating a project and workbench](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/2.8/html/getting_started_with_red_hat_openshift_ai_self-managed/creating-a-workbench-select-ide_get-started) in the Red Hat OpenShift AI documentation. |
+
+<a id="step_0"></a>
+**‼️ ⓪ (Disconnected environment only) Mirror the [pipeline-components](https://github.com/opendatahub-io/pipelines-components) into Git server hosted on bastion node**
+
+If the mirror is successful, the following output should be visible on your Git server hosted on the bastion node: 
+![bastion_node_repo](images/bastion_node_repo.png)
+
 
 **Step ① — Choose workbench image and size:**
 ![workbench_resources](images/workbench_resources.png)
 
-**Step ② — Attach Llama Stack Server API key and base URL as env variables:**
+**‼️ ② (Disconnected environment only) Add env variables to workbench**
+![workbench_resources](images/disconnected_env_vars.png)
+
+**Step ③ — Attach Llama Stack Server API key and base URL as env variables:**
 ![workbench_resources](images/workbench_llama_stack_and_s3_conn.png)
 
-**Step ③ — Start the workbench**
+**Step ④ — Start the workbench**
 ![workbench_resources](images/start_workbench.png)
 
 <a id="upload-documents-and-test-data-to-s3"></a>
@@ -189,10 +202,12 @@ Each RAG pattern in the **rag_patterns_artifact** includes two generated noteboo
 ![evaluation results](images/evaluation_results.png)
 ![pattern data](images/pattern.png)
 
-**Step ④ Run `indexing.ipynb` notebook:**
+**Step ④ Run `indexing.ipynb` notebook:** <br/>
+‼️ To be able to run this notebook on the disconnected environment please replace the following text from the first code cell in the notebook `https://github.com/red-hat-data-services` with your Git server url hosted on the bastion node from the [step ⓪](#step_0)
 ![indexing notebook](images/indexing_nb.png)
 
 **Step ⑤ Run `inference.ipynb` notebook:**
+‼️ To be able to run this notebook on the disconnected environment please replace the following text from the first code cell in the notebook `https://github.com/red-hat-data-services` with your Git server url hosted on the bastion node from the [step ⓪](#step_0)
 ![inference notebook](images/inference_nb.png)
 
 Test your own questions against the generated RAG pattern at the end of the notebook.

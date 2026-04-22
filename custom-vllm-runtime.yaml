@@ -1,0 +1,57 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: ServingRuntime
+metadata:
+  name: vllm-custom-qwen35
+  namespace: ai-eng-cracow
+  annotations:
+    opendatahub.io/recommended-accelerators: '["nvidia.com/gpu"]'
+    opendatahub.io/runtime-version: v0.18.0
+    openshift.io/display-name: "Custom vLLM Runtime for Qwen 3.5 (v0.6+)"
+    opendatahub.io/apiProtocol: REST
+  labels:
+    opendatahub.io/dashboard: "true"
+spec:
+  annotations:
+    opendatahub.io/kserve-runtime: vllm
+    prometheus.io/path: /metrics
+    prometheus.io/port: "8080"
+  containers:
+  - name: kserve-container
+    # Using upstream vLLM image with Qwen 3.5 MoE support
+    # Check https://hub.docker.com/r/vllm/vllm-openai/tags for latest versions
+    image: vllm/vllm-openai:v0.6.4.post1
+    command:
+    - python
+    - -m
+    - vllm.entrypoints.openai.api_server
+    args:
+    - --port=8080
+    - --model=/mnt/models
+    - --served-model-name={{.Name}}
+    env:
+    - name: HF_HOME
+      value: /tmp/hf_home
+    - name: VLLM_LOGGING_LEVEL
+      value: INFO
+    # Optional: Add Hugging Face token if needed for model access
+    # - name: HF_TOKEN
+    #   valueFrom:
+    #     secretKeyRef:
+    #       name: hf-token-secret
+    #       key: token
+    ports:
+    - containerPort: 8080
+      protocol: TCP
+    resources:
+      requests:
+        cpu: "2"
+        memory: 8Gi
+        nvidia.com/gpu: "1"
+      limits:
+        cpu: "4"
+        memory: 16Gi
+        nvidia.com/gpu: "1"
+  multiModel: false
+  supportedModelFormats:
+  - name: vLLM
+    autoSelect: true

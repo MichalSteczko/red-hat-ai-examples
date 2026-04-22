@@ -82,14 +82,14 @@ Create S3-compatible connections so the pipeline can read test data and input do
 
 | Step | Action |
 |------|--------|
-| **⓪** | ‼️ This step is applicable only for disconnected environment. <br/> Mirror the [pipeline-components](https://github.com/opendatahub-io/pipelines-components) GitHub repository into your Git server on `bastion node`. |
+| **⓪** | ‼️ This step is applicable only for disconnected environment. <br/> Mirror the [pipeline-components](https://github.com/red-hat-data-services/pipelines-components) GitHub repository into your Git server on `bastion node`. |
 | **①** | In the project, go to **Workbenches** and create a **Workbench** (notebook environment). Choose an image and resource size as needed. |
-| **②** | ‼️ This step is applicable only for the disconnected environment. <br/> Add the following env variables to your workbench: <br/> - PIP_INDEX_URL=`<YOUR-BASTION-NODE-URL›:<PYPI-SERVER-PORT>/root/pypi/+simple/` <br/> - PIP_TRUSTED_HOST=`<YOUR-BASTION-NODE-URL>` <br/> -GIT_SSL_NO_VERIFY=`true` |
+| **②** | ‼️ This step is applicable only for the disconnected environment. <br/> Add the following env variables to your workbench: <br/> - PIP_INDEX_URL=`<YOUR-BASTION-NODE-URL>:<PYPI-SERVER-PORT>/root/pypi/+simple/` <br/> - PIP_TRUSTED_HOST=`<YOUR-BASTION-NODE-URL>` <br/> - GIT_SSL_NO_VERIFY=`true` |
 | **③** | During workbench setup, use **Attach existing connections** to attach the **Llama-stack** connection (from [Create Llama-stack connection](#create-llama-stack-connection-secret)) and the **S3 data** connection (from [Create S3 connections](#create-s3-connections)) used for test data and input documents. |
 | **④** | Save and launch the workbench. For full steps, see [Creating a project and workbench](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/2.8/html/getting_started_with_red_hat_openshift_ai_self-managed/creating-a-workbench-select-ide_get-started) in the Red Hat OpenShift AI documentation. |
 
 <a id="step_0"></a>
-**‼️ ⓪ (Disconnected environment only) Mirror the [pipeline-components](https://github.com/opendatahub-io/pipelines-components) into Git server hosted on bastion node**
+**‼️ ⓪ (Disconnected environment only) Mirror the [pipeline-components](https://github.com/red-hat-data-services/pipelines-components) into Git server hosted on bastion node**
 
 If the mirror is successful, the following output should be visible on your Git server hosted on the bastion node:
 ![bastion_node_repo](images/bastion_node_repo.png)
